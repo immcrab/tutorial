@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutorial</title>
+    <title>Bot Status</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
-This is a example website.
+<body style="background: #23272a; color: white; text-align: center; font-family: sans-serif;">
+    <h1>My Discord Bot</h1>
+    <div id="status-box" style="padding: 20px; border: 2px solid grey; display: inline-block;">
+        <p>Status: <span id="state">Checking...</span></p>
+        <p>Servers: <span id="servers">0</span></p>
+    </div>
+
+    <script>
+        // PASTE YOUR FIREBASE CONFIG HERE FROM PROJECT SETTINGS
+        const firebaseConfig = { /* Get this from Firebase Console */ };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        db.collection('bot_status').doc('status').onSnapshot((doc) => {
+            const data = doc.data();
+            const now = Date.now();
+            const isRecent = (now - data.last_seen) < 130000; // If seen in last 2 mins
+
+            document.getElementById('state').innerText = isRecent ? "✅ ONLINE" : "❌ OFFLINE";
+            document.getElementById('state').style.color = isRecent ? "#43b581" : "#f04747";
+            document.getElementById('servers').innerText = data.server_count;
+        });
+    </script>
 </body>
 </html>
